@@ -1,0 +1,9 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd 'c:\\\\Users\\\\COMPUTER-GURU\\\\GIT\\\\pharm' ; Write-Output 'Comparing backend source files:' ; \\$left=Get-ChildItem -Recurse -File \\./backend/src \\| ForEach-Object \\{ \\$_\\.FullName\\.Substring\\(\\$PWD\\.Path\\.Length\\+1\\)\\.Replace\\('\\\\\\\\','/'\\) \\} ; foreach \\(\\$f in \\$left\\) \\{ \\$che=Join-Path \\$PWD\\.Path 'che' \\$f ; if \\(Test-Path \\$che\\) \\{ \\$hash1=\\(Get-FileHash \\$f -Algorithm SHA256\\)\\.Hash; \\$hash2=\\(Get-FileHash \\$che -Algorithm SHA256\\)\\.Hash; if \\(\\$hash1 -ne \\$hash2\\) \\{ Write-Output \"DIFF: \\$f\" \\} \\} else \\{ Write-Output \"MISSING IN CHE: \\$f\" \\} \\} ; Write-Output 'Comparing frontend source files:' ; \\$left=Get-ChildItem -Recurse -File \\./frontend/src \\| ForEach-Object \\{ \\$_\\.FullName\\.Substring\\(\\$PWD\\.Path\\.Length\\+1\\)\\.Replace\\('\\\\\\\\','/'\\) \\} ; foreach \\(\\$f in \\$left\\) \\{ \\$che=Join-Path \\$PWD\\.Path 'che' \\$f ; if \\(Test-Path \\$che\\) \\{ \\$hash1=\\(Get-FileHash \\$f -Algorithm SHA256\\)\\.Hash; \\$hash2=\\(Get-FileHash \\$che -Algorithm SHA256\\)\\.Hash; if \\(\\$hash1 -ne \\$hash2\\) \\{ Write-Output \"DIFF: \\$f\" \\} \\} else \\{ Write-Output \"MISSING IN CHE: \\$f\" \\} \\} ;$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "git remote": true
+    }
+}
