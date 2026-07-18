@@ -61,31 +61,58 @@ export default function Reports() {
 
 function SalesReport() {
   const [data, setData] = useState(null);
+  const [period, setPeriod] = useState("daily");
   const chartRef = useRef(null);
 
   useEffect(() => {
-    api.get("/reports/sales-performance").then(setData);
-  }, []);
+    api.get(`/reports/sales-performance?period=${period}`).then(setData);
+  }, [period]);
 
   if (!data) return <div className="empty-state">Loading…</div>;
 
-  const chartData = data.daily.map((d) => ({ ...d, revenue: Number(d.revenue) }));
+  const chartData = data.data.map((d) => ({ ...d, revenue: Number(d.revenue) }));
+
+  const periodLabels = {
+    daily: "Day",
+    weekly: "Week",
+    monthly: "Month",
+    yearly: "Year"
+  };
 
   return (
     <>
       <ReportActions
         onPrint={() => window.print()}
         onDownload={() => downloadCsv(
-          "sales-performance.csv",
+          `sales-performance-${period}.csv`,
           [
-            { label: "Day", value: "day" },
+            { label: periodLabels[period], value: "period" },
+            { label: "Transactions", value: "transactions" },
             { label: "Revenue", value: (row) => formatMoney(row.revenue) },
           ],
           chartData
         )}
       />
+
+      {/* Period Selector */}
+      <div className="card print-hide" style={{ marginBottom: 18 }}>
+        <div className="card-header"><h3 style={{ margin: 0 }}>Report Period</h3></div>
+        <div className="card-pad" style={{ display: 'flex', gap: '10px' }}>
+          {["daily", "weekly", "monthly", "yearly"].map((p) => (
+            <button
+              key={p}
+              className={`btn ${period === p ? "btn-primary" : "btn-secondary"}`}
+              onClick={() => setPeriod(p)}
+              style={{ textTransform: 'capitalize' }}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="card print-card-chart" style={{ marginBottom: 18 }}>
-        <div className="card-header"><h2>Revenue by Day</h2></div>
+        <div className="card-header"><h2>Revenue by {periodLabels[period]}</h2></div>
         <div className="card-pad print-chart-container" ref={chartRef} style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {chartData.length === 0 ? (
             <div className="empty-state">No sales recorded yet.</div>
@@ -94,11 +121,11 @@ function SalesReport() {
               <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis 
-                  dataKey="day" 
+                  dataKey="period" 
                   tick={{ fontSize: 12 }}
-                  angle={data.daily.length > 14 ? -45 : 0}
-                  textAnchor={data.daily.length > 14 ? "end" : "middle"}
-                  height={data.daily.length > 14 ? 80 : 40}
+                  angle={chartData.length > 14 ? -45 : 0}
+                  textAnchor={chartData.length > 14 ? "end" : "middle"}
+                  height={chartData.length > 14 ? 80 : 40}
                 />
                 <YAxis tick={{ fontSize: 12 }} width={60} />
                 <Tooltip formatter={(v) => formatMoney(v)} labelStyle={{ color: '#000' }} />
@@ -134,7 +161,7 @@ function SalesReport() {
       {/* Print Summary Footer */}
       <div className="print-summary">
         <p><strong>Report Generated:</strong> {new Date().toLocaleString()}</p>
-        <p><strong>Date Range:</strong> {chartData.length > 0 ? `${chartData[0].day} to ${chartData[chartData.length - 1].day}` : 'N/A'}</p>
+        <p><strong>Report Type:</strong> {periodLabels[period]} Summary</p>
         <p><strong>Total Transactions:</strong> {chartData.reduce((sum, d) => sum + d.transactions, 0)}</p>
         <p><strong>Total Revenue:</strong> {formatMoney(chartData.reduce((sum, d) => sum + d.revenue, 0))}</p>
       </div>

@@ -38,11 +38,33 @@ router.get("/summary", (req, res) => {
   });
 });
 
-// Sales performance over a date range, grouped by day
+// Sales performance over a date range, grouped by period (daily, weekly, monthly, yearly)
 router.get("/sales-performance", requireRole("manager"), (req, res) => {
-  const { from, to } = req.query;
+  const { from, to, period = "daily" } = req.query;
+  
+  // Determine grouping and label based on period
+  let groupBy, label;
+  switch(period) {
+    case "weekly":
+      groupBy = "strftime('%Y-W%W', created_at)";
+      label = "week";
+      break;
+    case "monthly":
+      groupBy = "strftime('%Y-%m', created_at)";
+      label = "month";
+      break;
+    case "yearly":
+      groupBy = "strftime('%Y', created_at)";
+      label = "year";
+      break;
+    case "daily":
+    default:
+      groupBy = "date(created_at)";
+      label = "day";
+  }
+  
   let sql = `
-    SELECT date(created_at) as day, COUNT(*) as transactions, SUM(total_amount) as revenue
+    SELECT ${groupBy} as period_label, COUNT(*) as transactions, SUM(total_amount) as revenue
     FROM sales WHERE 1=1
   `;
   const params = [];
@@ -54,8 +76,16 @@ router.get("/sales-performance", requireRole("manager"), (req, res) => {
     sql += " AND created_at <= ?";
     params.push(to);
   }
-  sql += " GROUP BY day ORDER BY day ASC";
-  const daily = db.all(sql, params);
+  sql += ` GROUP BY ${groupBy} ORDER BY period_label ASC`;
+  
+  const data = db.all(sql, params);
+  
+  // Format the results to include both period_label and a readable label
+  const formatted = data.map(row => ({
+    period: row.period_label,
+    transactions: row.transactions,
+    revenue: row.revenue
+  }));
 
   const topProducts = db.all(
     `SELECT p.name, SUM(si.quantity) as units_sold, SUM(si.line_total) as revenue
@@ -69,7 +99,7 @@ router.get("/sales-performance", requireRole("manager"), (req, res) => {
     [...(from ? [from] : []), ...(to ? [to] : [])]
   );
 
-  res.json({ daily, top_products: topProducts });
+  res.json({ period, data: formatted, top_products: topProducts });
 });
 
 // Stock status report
