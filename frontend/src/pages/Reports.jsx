@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import AppShell from "../components/AppShell.jsx";
 import Pill from "../components/Pill.jsx";
@@ -33,6 +33,9 @@ function ReportActions({ onPrint, onDownload }) {
     <div className="report-actions">
       <button className="btn btn-secondary" onClick={onPrint}>Print</button>
       <button className="btn btn-secondary" onClick={onDownload}>Download CSV</button>
+      <small style={{ alignSelf: 'center', color: 'var(--text-secondary)', marginLeft: '10px', fontSize: '12px' }}>
+        💡 Tip: Use Landscape orientation for better chart visibility
+      </small>
     </div>
   );
 }
@@ -58,6 +61,7 @@ export default function Reports() {
 
 function SalesReport() {
   const [data, setData] = useState(null);
+  const chartRef = useRef(null);
 
   useEffect(() => {
     api.get("/reports/sales-performance").then(setData);
@@ -80,32 +84,38 @@ function SalesReport() {
           chartData
         )}
       />
-      <div className="card" style={{ marginBottom: 18 }}>
+      <div className="card print-card-chart" style={{ marginBottom: 18 }}>
         <div className="card-header"><h2>Revenue by Day</h2></div>
-        <div className="card-pad" style={{ height: 280 }}>
+        <div className="card-pad print-chart-container" ref={chartRef} style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {chartData.length === 0 ? (
             <div className="empty-state">No sales recorded yet.</div>
           ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v) => formatMoney(v)} />
-                <Line type="monotone" dataKey="revenue" stroke="#14807f" strokeWidth={2} dot={{ r: 3 }} />
+                <XAxis 
+                  dataKey="day" 
+                  tick={{ fontSize: 12 }}
+                  angle={data.daily.length > 14 ? -45 : 0}
+                  textAnchor={data.daily.length > 14 ? "end" : "middle"}
+                  height={data.daily.length > 14 ? 80 : 40}
+                />
+                <YAxis tick={{ fontSize: 12 }} width={60} />
+                <Tooltip formatter={(v) => formatMoney(v)} labelStyle={{ color: '#000' }} />
+                <Line type="monotone" dataKey="revenue" stroke="#14807f" strokeWidth={2.5} dot={{ r: 4 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           )}
         </div>
       </div>
 
-      <div className="card">
+      <div className="card print-card-table">
         <div className="card-header"><h2>Top Products by Revenue</h2></div>
         {data.top_products.length === 0 ? (
           <div className="empty-state">No sales data yet.</div>
         ) : (
           <div className="table-scroll">
-            <table className="data-table">
+            <table className="data-table print-data-table">
               <thead><tr><th>Product</th><th className="num">Units Sold</th><th className="num">Revenue</th></tr></thead>
               <tbody>
                 {data.top_products.map((p, i) => (
@@ -119,6 +129,14 @@ function SalesReport() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Print Summary Footer */}
+      <div className="print-summary">
+        <p><strong>Report Generated:</strong> {new Date().toLocaleString()}</p>
+        <p><strong>Date Range:</strong> {chartData.length > 0 ? `${chartData[0].day} to ${chartData[chartData.length - 1].day}` : 'N/A'}</p>
+        <p><strong>Total Transactions:</strong> {chartData.reduce((sum, d) => sum + d.transactions, 0)}</p>
+        <p><strong>Total Revenue:</strong> {formatMoney(chartData.reduce((sum, d) => sum + d.revenue, 0))}</p>
       </div>
     </>
   );

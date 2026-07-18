@@ -861,14 +861,186 @@ table.data-table {
 }
 
 @media print {
-  body { background: white; color: black; }
-  .app-shell { display: block; }
-  .sidebar, .topbar, .tabs, .toolbar, .modal, .banner, .btn, .sidebar-footer, .report-actions { display: none !important; }
-  .page-content { padding: 0; }
-  .card { box-shadow: none; border: none; background: transparent; }
-  .data-table, .data-table th, .data-table td { border-color: black; }
-  .data-table th, .data-table td { color: black; }
-  .table-scroll { overflow: visible; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { 
+    background: white; 
+    color: black; 
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+  
+  .app-shell { 
+    display: block; 
+    margin: 0;
+    padding: 0;
+  }
+  
+  .sidebar, .topbar, .tabs, .toolbar, .modal, .banner, .btn, .sidebar-footer, .report-actions { 
+    display: none !important; 
+  }
+  
+  .page-content { 
+    padding: 20px;
+    max-width: 100%;
+  }
+  
+  /* Card styling for print */
+  .card { 
+    box-shadow: none; 
+    border: 1px solid #333; 
+    background: white;
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  .card-header {
+    border-bottom: 2px solid #333;
+    padding: 10px 15px;
+    background: #f5f5f5;
+    page-break-after: avoid;
+  }
+  
+  .card-header h2 {
+    font-size: 13pt;
+    font-weight: bold;
+    margin: 0;
+    color: black;
+  }
+  
+  .card-pad {
+    padding: 15px;
+  }
+  
+  /* Print-specific chart styling */
+  .print-chart-container {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    background: white !important;
+    border: 1px solid #ddd;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 400px;
+  }
+  
+  .print-card-chart {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  .print-card-table {
+    page-break-inside: auto;
+  }
+  
+  /* Chart SVG elements */
+  svg {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* Ensure recharts elements print with good contrast */
+  text { color: black; fill: black; }
+  line { stroke: black; }
+  path { stroke: black; fill: none; }
+  .recharts-wrapper { background: white; }
+  .recharts-surface { background: white; }
+  .recharts-layer { color: black; }
+  .recharts-cartesian-axis-tick { color: black; }
+  .recharts-text { color: black; }
+  tspan { color: black; fill: black; }
+  
+  /* Table styling for print */
+  .data-table { 
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  .data-table th, .data-table td { 
+    border: 1px solid #333;
+    padding: 8px;
+    text-align: left;
+    color: black;
+  }
+  
+  .data-table th {
+    background-color: #e0e0e0;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .data-table th.num,
+  .data-table td.num {
+    text-align: right;
+  }
+  
+  .data-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .table-scroll { 
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  
+  .table-scroll table {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  /* Print summary footer */
+  .print-summary {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #333;
+    font-size: 10pt;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  .print-summary p {
+    margin: 5px 0;
+    color: black;
+  }
+  
+  /* Empty state styling */
+  .empty-state {
+    color: black;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  /* Pill styling for print */
+  .pill {
+    border: 1px solid black;
+    background: white;
+    color: black;
+  }
+  
+  /* Ensure text colors are black/dark */
+  td, th, p, span, div {
+    color: black !important;
+  }
+  
+  /* Page setup - Default Portrait */
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+  
+  /* Landscape orientation for charts */
+  .print-card-chart {
+    page: chart-landscape;
+  }
+  
+  @page chart-landscape {
+    size: A4 landscape;
+    margin: 15mm;
+  }
 }
 
 .report-actions {
@@ -887,6 +1059,26 @@ table.data-table {
 
 .table-scroll table {
   min-width: 800px;
+}
+
+/* Print utilities */
+.print-summary {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: var(--radius-md);
+  margin-top: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.print-summary p {
+  margin: 6px 0;
+  color: var(--text-secondary);
+}
+
+.print-data-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
 @media (max-width: 880px) {
