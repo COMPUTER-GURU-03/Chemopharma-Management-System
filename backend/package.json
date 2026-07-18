@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "seed": "node src/seed.js",
+    "seed:extreme": "node src/seed-extreme.js",
     "dev": "node src/server.js"
   },
   "dependencies": {
