@@ -4,6 +4,8 @@ A computerized pharmacy management system built for Chemo Pharm Store, covering
 user management, batch-level inventory tracking, sales, a manager-approved
 restocking workflow, expiry monitoring, and reporting.
 
+# Testing
+
 ## Stack
 
 - **Backend:** Node.js, Express, SQLite (via `node-sqlite3-wasm`, no native
