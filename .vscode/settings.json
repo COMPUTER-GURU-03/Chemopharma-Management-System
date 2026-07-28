@@ -4,6 +4,10 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "git remote": true
+        "git remote": true,
+        "/^cd c:\\\\Users\\\\COMPUTER-GURU\\\\GIT\\\\pharm\\\\backend ; npm run seed:extreme$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }
