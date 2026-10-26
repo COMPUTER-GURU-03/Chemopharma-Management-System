@@ -29,7 +29,7 @@ chemo-pharm/
 │   │       ├── sales.js
 │   │       ├── restock.js
 │   │       └── reports.js
-│   └── db/                  # SQLite file lives here (created on first run)
+│   └── db/                  # local SQLite database (created on first run)
 └── frontend/
     └── src/
         ├── pages/            # Dashboard, Inventory, Sales, Restock, Alerts, Reports, Users, Login
@@ -38,6 +38,24 @@ chemo-pharm/
 ```
 
 ## Getting started
+
+### Configure the backend secret first
+
+The API requires a `JWT_SECRET` of at least 32 characters and will refuse to
+start without it. This prevents the application from silently using a known
+default signing key.
+
+1. Copy `backend/.env.example` to `backend/.env`.
+2. Replace the example value with a unique, randomly generated secret.
+3. Keep `backend/.env` private. Never commit it or reuse the same secret in
+   production. If the application was ever deployed with the old development
+   default, invalidate existing sessions and configure a new secret.
+
+For example, generate a secret locally with Node.js:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
 ### Root workspace
 
@@ -48,7 +66,8 @@ npm run seed       # creates the SQLite DB and demo users/products
 npm run dev
 ```
 
-This runs both backend and frontend together from the project root.
+This runs both backend and frontend together from the project root. Configure
+`backend/.env` before starting the API.
 
 ### 1. Backend
 
@@ -78,9 +97,9 @@ Open http://localhost:5173 in your browser.
 | Manager    | manager     | manager123  |
 | Pharmacist | pharmacist  | pharma123   |
 
-Change these immediately if you deploy this anywhere beyond a demo —
-passwords are stored hashed (bcrypt), but the seed values are obviously not
-production-safe.
+These credentials are for local demonstrations only. Change them before any
+deployment beyond a disposable demo. Passwords are stored hashed (bcrypt), but
+the seed values are publicly documented and are not production-safe.
 
 ## Feature mapping (to the original objectives)
 
