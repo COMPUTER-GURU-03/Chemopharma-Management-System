@@ -1,5 +1,15 @@
 node_modules/
 dist/
-db/*.sqlite
+
+# Local databases (including nested backend databases)
+*.sqlite
+*.sqlite3
+*.db
+backend/db/*
+!backend/db/.gitkeep
+
+# Environment files and logs
 .env
+.env.*
+!.env.example
 *.log
